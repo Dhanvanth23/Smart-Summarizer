@@ -1,0 +1,9 @@
+Flask
+transformers
+requests
+beautifulsoup4
+mtranslate
+gTTS
+httpx
+uuid
+torch
