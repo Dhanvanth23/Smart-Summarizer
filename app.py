@@ -280,7 +280,7 @@ def get_news():
 @app.route('/history')
 def history():
     # This would ideally be fetched from a database
-    # For now, we'll just display a message
+    # For now, we'll just display a message1234567890
     return render_template('history.html', languages=SUPPORTED_LANGUAGES, categories=NEWS_CATEGORIES)
 
 if __name__ == '__main__':
