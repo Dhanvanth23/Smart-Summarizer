@@ -1,22 +1,19 @@
-from flask import Flask, render_template, request, jsonify, redirect, url_for
-from transformers import BartForConditionalGeneration, BartTokenizer
-import requests
-from bs4 import BeautifulSoup
-from mtranslate import translate
-from gtts import gTTS
+from flask import Flask
+from config import AUDIO_DIR
 import os
-import http.client
-import json
-import uuid
-import time
 
+# Import blueprints
+from routes.main_routes import main_routes
+from routes.news_routes import news_routes
+from routes.api_routes import api_routes
+
+# Initialize Flask app
 app = Flask(__name__)
 
-# Directory to store audio files
-AUDIO_DIR = "static/audio"
-if not os.path.exists(AUDIO_DIR):
-    os.makedirs(AUDIO_DIR)
+# Setup directories
+os.makedirs(AUDIO_DIR, exist_ok=True)
 
+<<<<<<< HEAD
 # Load BART model and tokenizer
 model_name = "facebook/bart-large-cnn"
 model = BartForConditionalGeneration.from_pretrained(model_name)
@@ -282,6 +279,12 @@ def history():
     # This would ideally be fetched from a database
     # For now, we'll just display a message1234567890
     return render_template('history.html', languages=SUPPORTED_LANGUAGES, categories=NEWS_CATEGORIES)
+=======
+# Register blueprints
+app.register_blueprint(main_routes)
+app.register_blueprint(news_routes)
+app.register_blueprint(api_routes)
+>>>>>>> 60f8bed (Module)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)   
