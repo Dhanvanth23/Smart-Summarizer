@@ -1,0 +1,16 @@
+Plan to switch news API from india-today-unofficial to google-news13:
+
+1. config.py:
+- Update NEWS_API_PRIMARY dictionary:
+  - base_url: https://google-news13.p.rapidapi.com/business?lr=en-US
+  - host: google-news13.p.rapidapi.com
+  - name: Google News 13
+
+2. modules/news/service2.py:
+- Update API call URL to use NEWS_API_PRIMARY['base_url'] without appending category (since the example URL includes category and language).
+- Update headers to use NEWS_API_PRIMARY['host'].
+- Keep using RAPIDAPI_KEY from config.py.
+
+3. Test the news fetching functionality to ensure it works with the new API.
+
+Please confirm if I can proceed with this plan.

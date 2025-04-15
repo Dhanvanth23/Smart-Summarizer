@@ -2,7 +2,7 @@
 import logging
 from flask import Blueprint, request, jsonify, render_template, abort
 from config import SUPPORTED_LANGUAGES, NEWS_CATEGORIES
-from .service2 import get_news_from_api
+from .service2 import get_news_from_news_api as get_news_from_api
 from ..utils.web import fetch_article_text, validate_url
 from modules.utils.shared import summarize_text
 from ..audio.service3 import text_to_speech_openai
@@ -14,6 +14,24 @@ logger = logging.getLogger(__name__)
 
 # Create blueprint
 news_bp = Blueprint('news', __name__, url_prefix='/news')
+
+@news_bp.route('/test')
+def test_news():
+    """Test route to check news API directly"""
+    try:
+        articles = get_news_from_api('en', 'general', 5)
+        return jsonify({
+            'success': True,
+            'articles': articles,
+            'message': 'Test successful'
+        })
+    except Exception as e:
+        logger.error(f"Test route error: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'message': 'Test failed'
+        })
 
 @news_bp.route('/')
 def news_home():

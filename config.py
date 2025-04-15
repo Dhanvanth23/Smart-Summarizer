@@ -1,8 +1,8 @@
 import os
 
 # API Keys
-RAPIDAPI_KEY = os.environ.get('RAPIDAPI_KEY', "0e51d0e9a1mshf756a7e9aad1245p1a8e74jsn05b439507893")
-NEWS_API_KEY = os.environ.get('NEWS_API_KEY', "0e51d0e9a1mshf756a7e9aad1245p1a8e74jsn05b439507893")
+RAPIDAPI_KEY = os.environ.get('RAPIDAPI_KEY', "487032371fmshcd466cc4d5f0ae8p11048cjsnc1caf1284a55")  # India Today RapidAPI key
+NEWS_API_KEY = os.environ.get('NEWS_API_KEY', "a6b05e480d17418596c0b82b2a66de9e")  # Updated NewsAPI key
 
 # Directories
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -27,24 +27,22 @@ SUPPORTED_LANGUAGES = {
     'uz': 'Uzbek', 'yi': 'Yiddish', 'yo': 'Yoruba', 'zu': 'Zulu', 'gl': 'Galician'
 }
 
-# News categories
+# News categories - simplified to match Google News API categories
 NEWS_CATEGORIES = {
-    'general': 'General', 'business': 'Business', 'entertainment': 'Entertainment',
-    'health': 'Health', 'science': 'Science', 'sports': 'Sports', 'technology': 'Technology'
-}
-
-# Categories mapping for India Today API
-INDIA_TODAY_CATEGORIES = {
-    'general': 'india', 'business': 'business', 'technology': 'technology',
-    'entertainment': 'entertainment', 'sports': 'sports', 'science': 'science',
-    'health': 'health', 'politics': 'politics'
+    'general': 'General',
+    'business': 'Business',
+    'technology': 'Technology',
+    'entertainment': 'Entertainment',
+    'sports': 'Sports',
+    'science': 'Science',
+    'health': 'Health'
 }
 
 # API configurations
 NEWS_API_PRIMARY = {
-    'base_url': 'https://india-today-unofficial.p.rapidapi.com/news',
-    'host': 'india-today-unofficial.p.rapidapi.com',
-    'name': 'India Today'
+    'base_url': 'https://google-news1.p.rapidapi.com',
+    'host': 'google-news1.p.rapidapi.com',
+    'name': 'Google News'
 }
 
 NEWS_API_BACKUP = {
