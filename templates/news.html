@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">News</h1>
+    
+    <!-- Controls -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <select id="category" class="form-select">
+                {% for key, value in categories.items() %}
+                <option value="{{ key }}">{{ value }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-4">
+            <select id="language" class="form-select">
+                {% for code, name in languages.items() %}
+                <option value="{{ code }}">{{ name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <!-- News Articles -->
+    <div id="news-container" class="row">
+        <!-- Articles will be loaded here -->
+    </div>
+
+    <!-- Load More Button -->
+    <div class="text-center mt-4 mb-4">
+        <button id="load-more" class="btn btn-primary" style="display: none;">Load More</button>
+    </div>
+</div>
+
+<!-- Article Template -->
+<template id="article-template">
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <img src="" class="card-img-top article-image" alt="News Image" onerror="this.src='/static/img/news-placeholder.jpg'">
+            <div class="card-body">
+                <h5 class="card-title article-title"></h5>
+                <p class="card-text article-description text-muted small"></p>
+                <div class="card-text article-summary" style="display: none;"></div>
+                <div class="mt-3">
+                    <small class="text-muted article-source"></small>
+                    <small class="text-muted article-date float-end"></small>
+                </div>
+                <div class="mt-3 d-flex justify-content-between">
+                    <a href="#" class="btn btn-primary btn-sm article-link" target="_blank">Read More</a>
+                    <button class="btn btn-outline-primary btn-sm summarize-btn">
+                        <span class="spinner-border spinner-border-sm" role="status" style="display: none;"></span>
+                        Summarize
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<!-- JavaScript for handling news loading -->
+<script>
+let currentPage = 1;
+let hasMore = false;
+
+function summarizeArticle(button, url, language) {
+    const card = button.closest('.card');
+    const summaryDiv = card.querySelector('.article-summary');
+    const spinner = button.querySelector('.spinner-border');
+    
+    // Show loading state
+    button.disabled = true;
+    spinner.style.display = 'inline-block';
+    button.textContent = ' Summarizing...';
+    button.prepend(spinner);
+    
+    // Make request to summarize endpoint
+    fetch('/news/summarize', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `url=${encodeURIComponent(url)}&language=${language}&max_length=150`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            summaryDiv.innerHTML = `<strong>Summary:</strong> ${data.summary}`;
+            summaryDiv.style.display = 'block';
+            button.style.display = 'none';  // Hide the button after successful summarization
+        } else {
+            throw new Error(data.error || 'Failed to generate summary');
+        }
+    })
+    .catch(error => {
+        console.error('Error summarizing article:', error);
+        alert('Failed to generate summary. Please try again.');
+        button.textContent = 'Retry Summarize';
+    })
+    .finally(() => {
+        button.disabled = false;
+        spinner.style.display = 'none';
+    });
+}
+
+function loadNews(page = 1) {
+    const category = document.getElementById('category').value;
+    const language = document.getElementById('language').value;
+    const url = `/news/get_articles?category=${category}&language=${language}&page=${page}`;
+    
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            const container = document.getElementById('news-container');
+            const template = document.getElementById('article-template');
+            
+            // Clear container if it's the first page
+            if (page === 1) {
+                container.innerHTML = '';
+            }
+            
+            // Update pagination state
+            currentPage = data.page;
+            hasMore = data.hasMore;
+            
+            // Show/hide load more button
+            document.getElementById('load-more').style.display = hasMore ? 'inline-block' : 'none';
+            
+            // Add articles
+            data.articles.forEach(article => {
+                const clone = template.content.cloneNode(true);
+                
+                // Set article data
+                clone.querySelector('.article-image').src = article.image;
+                clone.querySelector('.article-title').textContent = article.title;
+                clone.querySelector('.article-description').textContent = article.description;
+                clone.querySelector('.article-source').textContent = article.source;
+                clone.querySelector('.article-date').textContent = new Date(article.published_at).toLocaleDateString();
+                clone.querySelector('.article-link').href = article.url;
+                
+                // Add click handler for summarize button
+                const summarizeBtn = clone.querySelector('.summarize-btn');
+                summarizeBtn.addEventListener('click', () => {
+                    summarizeArticle(summarizeBtn, article.url, language);
+                });
+                
+                container.appendChild(clone);
+            });
+        })
+        .catch(error => {
+            console.error('Error loading news:', error);
+            alert('Failed to load news. Please try again later.');
+        });
+}
+
+// Initial load
+document.addEventListener('DOMContentLoaded', () => {
+    loadNews();
+    
+    // Set up event listeners
+    document.getElementById('category').addEventListener('change', () => {
+        currentPage = 1;
+        loadNews();
+    });
+    
+    document.getElementById('language').addEventListener('change', () => {
+        currentPage = 1;
+        loadNews();
+    });
+    
+    document.getElementById('load-more').addEventListener('click', () => {
+        loadNews(currentPage + 1);
+    });
+});
+</script>
+
+<style>
+.card-img-top {
+    height: 200px;
+    object-fit: cover;
+}
+
+.article-summary {
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 0.25rem;
+}
+
+.spinner-border {
+    margin-right: 0.5rem;
+}
+</style>
+{% endblock %} 

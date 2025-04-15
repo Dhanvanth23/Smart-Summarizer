@@ -3,10 +3,40 @@ from flask import Blueprint, render_template, request, jsonify
 import time
 from config import SUPPORTED_LANGUAGES, NEWS_CATEGORIES
 
-from .model import load_t5_model, summarize_with_t5
+from .model import load_t5_model, summarize_with_t5, summarize_with_gpt
 from modules.translation.service1 import translate_text
 from modules.audio.service3 import text_to_speech_openai
 from modules.utils.shared import summarize_text  # Import from shared utils
+
+class Summarizer:
+    """Main summarizer class that handles text summarization"""
+    def __init__(self):
+        self.model, self.tokenizer = load_t5_model()
+        
+    def summarize(self, text, language='en', max_length=150, min_length=50):
+        """
+        Summarize the given text
+        
+        Args:
+            text (str): Text to summarize
+            language (str): Target language code (default: 'en')
+            max_length (int): Maximum length of summary (default: 150)
+            min_length (int): Minimum length of summary (default: 50)
+            
+        Returns:
+            str: Generated summary
+        """
+        try:
+            summary, english_summary = summarize_text(
+                text,
+                language=language,
+                max_length=max_length,
+                min_length=min_length
+            )
+            return summary
+        except Exception as e:
+            print(f"Summarization error: {e}")
+            return None
 
 # Create blueprint
 summarizer_bp = Blueprint('summarizer', __name__, url_prefix='/summarize')

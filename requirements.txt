@@ -7,4 +7,5 @@ gTTS
 httpx
 uuid
 torch
-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
+lxml[html_clean]
+newspaper3k
